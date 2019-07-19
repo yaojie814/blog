@@ -1,0 +1,296 @@
+<!DOCTYPE html><html lang="[&quot;zh-CN&quot;,&quot;en&quot;,&quot;default&quot;]"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="姚杰的博客"><title>005 springMVC配置mongodb-template方式访问 | 雨中风筝</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">005 springMVC配置mongodb-template方式访问</h1><a id="logo" href="/.">雨中风筝</a><p class="description">雨，淅淅沥沥的下；风筝，摇曳穿梭</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">005 springMVC配置mongodb-template方式访问</h1><div class="post-meta">May 11, 2017<span> | </span><span class="category"><a href="/categories/mongodb/">mongodb</a></span></div><div class="post-content"><p>###springMVC配置mongodb</p>
+<h4 id="mongodb-简介"><a href="#mongodb-简介" class="headerlink" title="mongodb 简介"></a>mongodb 简介</h4><p>MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统。<br>在高负载的情况下，添加更多的节点，可以保证服务器性能。<br>MongoDB 旨在为WEB应用提供可扩展的高性能数据存储解决方案。<br>MongoDB 将数据存储为一个文档，数据结构由键值(key=&gt;value)对组成。MongoDB 文档类似于 JSON 对象。字段值可以包含其他文档，数组及文档数组。</p>
+<h4 id="mongodb-单机安装"><a href="#mongodb-单机安装" class="headerlink" title="mongodb 单机安装"></a>mongodb 单机安装</h4><p>参考链接</p>
+<pre><code>http://www.runoob.com/mongodb/mongodb-window-install.html
+</code></pre><h4 id="mongodb-设置用户密码"><a href="#mongodb-设置用户密码" class="headerlink" title="mongodb 设置用户密码"></a>mongodb 设置用户密码</h4><p>参考链接</p>
+<pre><code>http://www.cnblogs.com/itxiongwei/p/5520863.html
+</code></pre><h4 id="mongodb-集群的三种方式"><a href="#mongodb-集群的三种方式" class="headerlink" title="mongodb 集群的三种方式"></a>mongodb 集群的三种方式</h4><p>参考链接</p>
+<pre><code>http://blog.csdn.net/luonanqin/article/details/8497860
+</code></pre><h4 id="mongodb-集群设置用户密码"><a href="#mongodb-集群设置用户密码" class="headerlink" title="mongodb 集群设置用户密码"></a>mongodb 集群设置用户密码</h4><p>参考链接</p>
+<pre><code>http://blog.csdn.net/monkey_four/article/details/50854410
+</code></pre><h4 id="mongodb-Java编写"><a href="#mongodb-Java编写" class="headerlink" title="mongodb Java编写"></a>mongodb Java编写</h4><ul>
+<li>配置</li>
+</ul>
+<p>注：spring-data-mongodb1.6以上的版本需要配置的spring的版本需要4.0以上，否则报错java.lang.NoClassDefFoundError: org/springframework/objenesis/ObjenesisStd。所以我们这边引入1.5.6.RELEASE版本。</p>
+<p>pom.xml添加如下架包：</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.mongodb&lt;/groupId&gt;
+    &lt;artifactId&gt;mongo-java-driver&lt;/artifactId&gt;
+    &lt;version&gt;3.4.2&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.data&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-data-mongodb&lt;/artifactId&gt;
+    &lt;version&gt;1.5.6.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.data&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-data-mongodb-cross-store&lt;/artifactId&gt;
+    &lt;version&gt;1.5.6.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.springframework.data&lt;/groupId&gt;
+   &lt;artifactId&gt;spring-data-mongodb-log4j&lt;/artifactId&gt;
+   &lt;version&gt;1.5.6.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>添加配置文件如下：</p>
+<pre>
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+
+@Configuration
+public class MongoConfiguration {
+    private static final Logger logger=Logger.getLogger(MongoConfiguration.class);
+
+    /**
+     * mongodb节点1的ip
+     */
+    @Value("192.168.2.2")
+    private String ip1;
+
+    /**
+     * mongodb节点1的端口
+     */
+    @Value("27017")
+    private int port1;
+
+    /**
+     * 数据库
+     */
+    @Value("mytest")
+    private String db;
+
+    /**
+     * mongodb用户名
+     */
+    @Value("root")
+    private String userName;
+
+    /**
+     * mongodb密码
+     */
+    @Value("root")
+    private String password;
+
+    @SuppressWarnings("resource")
+    public @Bean MongoDbFactory mongoDbFactory() {
+        logger.info("连接mongodb数据库...");
+        final List<serveraddress> addrs = new ArrayList<serveraddress>();
+        //ServerAddress()两个参数分别为 服务器地址 和 端口
+        final ServerAddress serverAddress = new ServerAddress(ip1, port1);
+        addrs.add(serverAddress);
+
+        final List<mongocredential> credentials = new ArrayList<mongocredential>();
+        //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
+        final MongoCredential credential = MongoCredential.createScramSha1Credential(userName, db, password.toCharArray());
+        credentials.add(credential);
+
+        //通过连接认证获取MongoDB连接
+        final MongoClient mongoClient = new MongoClient(addrs,credentials);
+        return new SimpleMongoDbFactory(mongoClient, db);
+    }
+
+    public @Bean MongoTemplate mongoTemplate() {
+        return new MongoTemplate(mongoDbFactory());
+    }
+}
+</mongocredential></mongocredential></serveraddress></serveraddress></pre>
+这里是否需要加异常捕捉？
+<pre>
+try {
+    //通过连接认证获取MongoDB连接
+    final MongoClient mongoClient = new MongoClient(addrs,credentials);
+           return new SimpleMongoDbFactory(mongoClient, db);
+} catch (final Exception e) {
+        throw e;
+}
+</pre>
+
+<p>好了，至此配置mongodb完成了。这里没有自定义任何配置参数，均使用默认。如需要，可在构造函数里设置第三个参数。</p>
+<pre><code>new MongoClient(List&lt;ServerAddress&gt;, List&lt;MongoCredential&gt;, MongoClientOptions);
+</code></pre><p>参数详细设置可参考网址：</p>
+<pre><code>http://blog.csdn.net/qazwsx081/article/details/50924352
+</code></pre><ul>
+<li>代码使用</li>
+</ul>
+<p>1.实体注解</p>
+<p>@Document(collection=”tableName”)，表名，默认实体名</p>
+<p>@Id，主键，标注后自动生成唯一键</p>
+<p>@Indexed，生成索引</p>
+<p>…</p>
+<p>2.注入MongoTemplate，这里使用到了连接池</p>
+<pre><code>@Resource
+private MongoTemplate template;
+</code></pre><p>3.使用MongoTemplate操作mongodb</p>
+<p>api网址如下：</p>
+<pre><code>http://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/core/MongoTemplate.html
+</code></pre><p>4.使用特定项目封装的client</p>
+<p>针对以下代码不满足的自己封装进这里，这里是否需要抛出异常？TODO</p>
+<pre>
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import com.mongodb.WriteResult;
+
+@Component
+public class MongoClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoClient.class);
+
+    /**
+     * 注入mongodb连接池的template
+     */
+    @Resource
+    private MongoTemplate template;
+
+    /**
+     * 包含@Id的主键，会判断数据库是否存在，存在更新全部字段，不存在插入
+     * 不包含@Id的主键，直接插入
+     * @param t
+     */
+    public <t> void insertOrUpdate(final T t) {
+        template.save(t);
+    }
+
+    /**
+     * 插入list
+     * @param list
+     * @param clazz
+     */
+    public <t> void insertList(final List<t> list, final Class<t> clazz) {
+        template.insert(list, clazz);
+
+    }
+
+    /**
+     * 更新满足条件的第一条数据特定字段
+     * @param query
+     * @param update
+     * @param clazz
+     * @return
+     */
+    public <t> WriteResult updateFirst(final Map<string, object> andMap,final Map<string, object> orMap, final Map<string, object> updateMap, final Class<t> clazz) {
+        return template.updateFirst(getQuery(andMap, orMap), getUpdate(updateMap), clazz);
+    }
+
+    /**
+     * 更新满足条件的所有数据特定字段
+     * @param query
+     * @param update
+     * @param clazz
+     * @return
+     */
+    public <t> WriteResult updateMuti(final Map<string, object> andMap,final Map<string, object> orMap, final Map<string, object> updateMap, final Class<t> clazz) {
+        return template.updateMulti(getQuery(andMap, orMap), getUpdate(updateMap), clazz);
+    }
+
+    /**
+     * 查找满足条件的一条数据
+     * @param query
+     * @param update
+     * @param clazz
+     * @return
+     */
+    public <t> T findOne(final Map<string, object> andMap,final Map<string, object> orMap, final Class<t> clazz) {
+        return template.findOne(getQuery(andMap, orMap), clazz);
+    }
+
+    /**
+     * 查找满足条件list
+     * @param query
+     * @param update
+     * @param clazz
+     * @return
+     */
+    public <t> List<t> findList(final Map<string, object> andMap,final Map<string, object> orMap, final Class<t> clazz) {
+        return template.find(getQuery(andMap, orMap), clazz);
+    }
+
+    private Update getUpdate(final Map<string, object> updateMap) {
+        final Update update = new Update();
+        if (!CollectionUtils.isEmpty(updateMap)) {
+            final Set<entry<string, object>> entrys = updateMap.entrySet();
+            for (final Entry<string, object> entry : entrys) {
+                update.set(entry.getKey(), entry.getValue());
+            }
+        }
+        return update;
+    }
+
+    /**
+     * 满足andMap且条件 后再满足orMap或条件
+     * @param andMap
+     * @param orMap
+     * @return
+     */
+    private Query getQuery(final Map<string, object> andMap,final Map<string, object> orMap) {
+        final Criteria andCri = andCris(andMap);
+        final Criteria[] orCris = orCris(orMap);
+        final Criteria cri = new Criteria();
+        if (andCri != null) {
+            cri.andOperator(andCri);
+        }
+        if (orCris!=null && orCris.length>0) {
+            cri.orOperator(orCris);
+        }
+        final Query query = new Query(cri);
+        return query;
+    }
+
+    private Criteria andCris(final Map<string, object> map) {
+        final Criteria cri = new Criteria();
+        if (!CollectionUtils.isEmpty(map)) {
+            final Set<entry<string, object>> entrys = map.entrySet();
+            for (final Entry<string, object> entry : entrys) {
+                cri.and(entry.getKey()).is(entry.getValue());
+            }
+        }
+        return cri;
+    }
+
+    private Criteria[] orCris(final Map<string, object> map) {
+        final List<criteria> list = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(map)) {
+            final Set<entry<string, object>> entrys = map.entrySet();
+            for (final Entry<string, object> entry : entrys) {
+                list.add(Criteria.where(entry.getKey()).is(entry.getValue()));
+            }
+        }
+        return list.toArray(new Criteria[list.size()]);
+    }
+}
+</string,></entry<string,></criteria></string,></string,></entry<string,></string,></string,></string,></string,></entry<string,></string,></t></string,></string,></t></t></t></string,></string,></t></t></string,></string,></string,></t></t></string,></string,></string,></t></t></t></t></t></pre>
+
+</div><div class="tags"></div><div class="post-nav"><a class="pre" href="/2017/05/11/mongodb/006 mongodb-JDBC/">006 mongodb-JDBC方式访问</a><a class="next" href="/2017/05/11/mongodb/004 mongodb-deploy-practice/">004 部署Sharding（包含Replica Set）实践</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="search-form"><input id="local-search-input" placeholder="Search" type="text" name="q" results="0"><div id="local-search-result"></div></div></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/maven/">maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mongodb/">mongodb</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springMvc/">springMvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springcloud/">springcloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/部署/" style="font-size: 15px;">部署</a> <a href="/tags/es/" style="font-size: 15px;">es</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/定时任务/" style="font-size: 15px;">定时任务</a> <a href="/tags/工具类/" style="font-size: 15px;">工具类</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker-compose install tools/">docker-compose 安装工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker cmd/">docker 基础命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/install docker/">docker/docker-compose安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/docker in out/">docker 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/elastic search dump/">es 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/29/other/linux operator/">linux常规操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/24/other/git operator/">git操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/26/springboot/sharding jdbc/">springboot2.0.6使用sharding jdbc3.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/springboot/tip-springboot tip/">springboot一些方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/08/docker/docker install tools/">docker安装工具</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">雨中风筝.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/search.js?v=0.0.0"></script><script>var search_path = 'search.xml';
+if (search_path.length == 0) {
+   search_path = 'search.xml';
+}
+var path = '/' + search_path;
+searchFunc(path, 'local-search-input', 'local-search-result');
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

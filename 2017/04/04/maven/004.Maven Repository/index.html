@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="[&quot;zh-CN&quot;,&quot;en&quot;,&quot;default&quot;]"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="姚杰的博客"><title>004 Maven仓库 | 雨中风筝</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">004 Maven仓库</h1><a id="logo" href="/.">雨中风筝</a><p class="description">雨，淅淅沥沥的下；风筝，摇曳穿梭</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">004 Maven仓库</h1><div class="post-meta">Apr 4, 2017<span> | </span><span class="category"><a href="/categories/maven/">maven</a></span></div><div class="post-content"><h4 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h4><p>在学习maven仓库之前，必须先学会坐标与依赖。maven仓库的布局就是基于maven坐标的。</p>
+<p>（1）坐标</p>
+<p>以下是一个示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.baidu.myapp<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>weba<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>坐标包含groupId，artifactId，version，packaging，classifier。前3个是必须的，package可选（不写默认jar）,而classifier是不能直接定义的。前4个之前已经介绍过，这里讲下classifier。</p>
+<p>classifier：该元素用来帮助定义构建输出的一些附属构建。对应主构件：比如一个jar包含了java文档和源代码，这时候就有这两个附属构建的classifier。例子：TestNG主构件是基于java1.4的，但是它还有个基于java1.5的附属构建。附属构建是由附加的插件生成的，不能直接定义。</p>
+<p>（2）依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>...<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>...<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>...<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">type</span>&gt;</span>...<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">scope</span>&gt;</span>...<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">optional</span>&gt;</span>...<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">exclusion</span>&gt;</span>...<span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">		...</span><br><span class="line">	<span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>groupId，artifactId，version是必须的，不做介绍了</p>
+</li>
+<li><p>type：对应开发时的package，默认jar</p>
+</li>
+<li><p>scope：依赖范围</p>
+<p>  有compile，test，provided，runtime，system</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>scope</th>
+<th>编译有效</th>
+<th>测试有效</th>
+<th>运行时有效</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>compile</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>spring-core</td>
+</tr>
+<tr>
+<td>test</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>JUnit</td>
+</tr>
+<tr>
+<td>provided</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td>servlet-api</td>
+</tr>
+<tr>
+<td>runtime</td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+<td>JDBC驱动实现</td>
+</tr>
+<tr>
+<td>system</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td>本地类库文件</td>
+</tr>
+</tbody>
+</table>
+<pre><code>依赖是可传递的，对于不同的依赖范围传递性也不一样。A对B第一直接依赖（下表的第一竖列），B对C第二直接依赖（下表的第一横行），得到的就是A对C的依赖是否传递
+</code></pre><table>
+<thead>
+<tr>
+<th></th>
+<th>compile</th>
+<th>test</th>
+<th>provided</th>
+<th>runtime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>compile</td>
+<td>compile</td>
+<td></td>
+<td></td>
+<td>runtime</td>
+</tr>
+<tr>
+<td>test</td>
+<td>test</td>
+<td></td>
+<td></td>
+<td>test</td>
+</tr>
+<tr>
+<td>provided</td>
+<td>provided</td>
+<td></td>
+<td>provided</td>
+<td>provided</td>
+</tr>
+<tr>
+<td>runtime</td>
+<td>runtime</td>
+<td></td>
+<td></td>
+<td>runtime</td>
+</tr>
+</tbody>
+</table>
+<pre><code>第一原则：当引入2个依赖X，Y时；X-&gt;B-&gt;C-&gt;D(1.0)，Y-&gt;E-&gt;D(2.0)。前一个D需要3步，后一个D需要2步，所以这里只有D(2.0)会被解析，可达性优先原则。
+
+第二原则：当引入2个依赖X，Y时；X-&gt;B-&gt;D(1.0)，Y-&gt;E-&gt;D(2.0)。前一个D需要2步，后一个D需要2步，当X在pom.xml中先声明，则这里只有D(1.0)会被解析，声明优先原则。（Maven2.0.9后）
+</code></pre><ul>
+<li><p>optional：标记依赖是否可选</p>
+<p>  在理想情况下，不使用可选依赖。可选依赖不可传递。</p>
+</li>
+<li><p>exclusions：排除传递性依赖</p>
+<p>  由于传递依赖会给项目隐式的引入很多依赖，很方便了使用者，但是有时候传递依赖中有一些不稳定的依赖，如SNAPSHOT版本，或我们需要更高版本的jar等。这时，我们可以使用排除不稳定（低版本）传递性依赖，然后添加我们需要的版本依赖。</p>
+</li>
+</ul>
+<p>（3）优化依赖</p>
+<p>Ⅰ、使用统一的版本管理,定义与引用如下：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">xxx.version</span>&gt;</span>2.0.0<span class="tag">&lt;/<span class="name">xxx.version</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>...<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>...<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>$</span><span class="template-variable">&#123;xxx.version&#125;</span><span class="xml"><span class="tag">&lt;/<span class="name">version</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>Ⅱ、以上，我们知道maven根据传递原则会过滤一些重复依赖，最终的依赖我们成为解析依赖。我们可以查看所有的解析依赖，代码：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn dependency:<span class="built_in">list</span></span><br></pre></td></tr></table></figure>
+<p>我们还可以通过依赖树来详细的了解依赖的传递关系(已经解析的依赖树)，代码：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mvn </span>dependency:tree</span><br></pre></td></tr></table></figure>
+<p>我们还可以通过maven来查看依赖是否显示声明还是使用了传递依赖。首先得到<b>Used undeclared dependencies found</b>，这是没有显式声明，但我们正在使用的jar，这些import的jar有一些隐藏的风向，假如依赖版本更改，我们不易察觉，推荐直接显式声明；其次得到<b>Unused declared dependencies found</b>指项目中未用到的jar，对于这些，我们需要仔细分析（这里代码分析出来的只是编译主代码和测试代码用到的jar，对于执行测试或运行时需要的jar没有发现），只有在确定完全没有使用到的时候才能删除依赖。maven分析代码：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mvn </span>dependency:analyze</span><br></pre></td></tr></table></figure>
+<h4 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h4><p>Maven中的仓库用来存放生成的构建和各种依赖。严格说来只有两种仓库：本地和远程。本地仓库指本机的一份拷贝，用来缓存远程下载、包含你尚未发布的临时构件。</p>
+<p>远程仓库指通过各种协议如file:// 和http:// 访问的其它类型的仓库。这些仓库可能是第三方搭建的真实的远程仓库，用来提供他们的构件下载（例如repo.maven.apache.org和uk.maven.org是Maven的中央仓库）。其它“远程”仓库可能是你的公司拥有的建立在文件或HTTP服务器上的内部仓库，用来在开发团队间共享私有构件和管理发布。</p>
+<p>本地和远程仓库有着相同的结构，所以脚本可以很容易地在两边运行，或同步仓库供离线使用。不过，一般情况下，仓库内部的布局对Maven用户是完全透明的。</p>
+<p>（1）本地仓库</p>
+<p>本地仓库位置定义在maven的conf/setting.xml中，就是第二节我们提到的</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">localRepository</span>&gt;</span>/.m2/repository<span class="tag">&lt;/<span class="name">localRepository</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>默认位置是：~/.m2/repository</p>
+<p>用户在使用maven时，都会把jar下载到本地的仓库中，才能被项目使用到。比如：我们执行mvn clean install 时，maven会自动把pom.xml文件中需要的jar从远程仓库下载到本地仓库，项目再去引用。</p>
+<p>（2）远程仓库</p>
+<p>远程仓库的配置也是通过setting文件，如第二节的</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mirrors</span>&gt;</span></span><br><span class="line">	 <span class="comment">&lt;!-- 阿里云仓库 --&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">id</span>&gt;</span>alimaven<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">name</span>&gt;</span>aliyun maven<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.aliyun.com/nexus/content/repositories/central/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	     <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line">         <span class="comment">&lt;!-- 中央仓库1 --&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">id</span>&gt;</span>repo1<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">name</span>&gt;</span>Human Readable Name for this Mirror.<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo1.maven.org/maven2/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line">         <span class="comment">&lt;!-- 中央仓库2 --&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">id</span>&gt;</span>repo2<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">name</span>&gt;</span>Human Readable Name for this Mirror.<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">             <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo2.maven.org/maven2/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Ⅰ、中央仓库 ——中央仓库是默认的远程仓库，maven安装文件自带了中央仓库。在$M2_HOME/lib/maven-model-builder-3.0.jar(maven3),然后找到 org/apache/maven/model/pom-4.0.0.xml中的中央仓库声明。这个文件是所有Maven项目都会继承的超级pom。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repositories</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">repository</span>&gt;</span>		<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">		</span><br><span class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>Central Repository<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo.maven.apache.org/maven2<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">layout</span>&gt;</span>default<span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repositories</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>snapshots的false表示不下载快照版本。自己还可以配置updatePolicy（从远程仓库更新的频率，默认daliy每天，还有never从不，always每次构建，inerval:N每隔N分钟）；checksumPolicy（检查检验和文件的策略，从maven下载构建时，会验证校验和文件，校验失败时，默认warn输出警告，fail构建失败，ignre忽略错误）</p>
+<p>Ⅱ、私服 ——私服可以让一些外部无法下载到的东西，本地上传后供合作者使用。</p>
+<p>有以下特点：</p>
+<p>1.节省外网流量。jar等只需要从外网下载一次到私服，以后团队只需要从私服下载；</p>
+<p>2.加速Maven构建。下载快速使构建加快；</p>
+<p>3.部署自己内部的jar等；</p>
+<p>4.提高下载jar等的稳定性；</p>
+<p>（3）远程仓库的认证</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">setting</span>&gt;</span></span><br><span class="line">    ...    <span class="tag">&lt;<span class="name">servers</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    	<span class="tag">&lt;<span class="name">server</span>&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="name">id</span>&gt;</span>仓库的id<span class="tag">&lt;/<span class="name">id</span>&gt;</span>      		<span class="tag">&lt;<span class="name">username</span>&gt;</span>...<span class="tag">&lt;/<span class="name">username</span>&gt;</span></span><br><span class="line">      		</span><br><span class="line">      		<span class="tag">&lt;<span class="name">password</span>&gt;</span>...<span class="tag">&lt;/<span class="name">password</span>&gt;</span>      	<span class="tag">&lt;/<span class="name">server</span>&gt;</span></span><br><span class="line">      	    <span class="tag">&lt;/<span class="name">servers</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">setting</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>（4）发布构件到远程仓库</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></span><br><span class="line">    ...    <span class="tag">&lt;<span class="name">distributionManagement</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    	<span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="name">id</span>&gt;</span>proj-releases<span class="tag">&lt;/<span class="name">id</span>&gt;</span>      		<span class="tag">&lt;<span class="name">name</span>&gt;</span>proj releases name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      		</span><br><span class="line">      		<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://xxxxxx/repositories/pro-releases<span class="tag">&lt;/<span class="name">url</span>&gt;</span>      		      	<span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br><span class="line">      	</span><br><span class="line">      	<span class="tag">&lt;<span class="name">snapshotRepository</span>&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="name">id</span>&gt;</span>proj-snapshots<span class="tag">&lt;/<span class="name">id</span>&gt;</span>      		<span class="tag">&lt;<span class="name">name</span>&gt;</span>proj snapshots name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      		</span><br><span class="line">      		<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://xxxxxx/repositories/pro-snapshots<span class="tag">&lt;/<span class="name">url</span>&gt;</span>      	<span class="tag">&lt;/<span class="name">snapshotRepository</span>&gt;</span>    <span class="tag">&lt;/<span class="name">distributionManagement</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    ...   </span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>repository为发布版本，snapshotRepository为快照版本。之后用以下发布到远程仓库。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mvn </span>clean deploy</span><br></pre></td></tr></table></figure>
+</div><div class="tags"></div><div class="post-nav"><a class="pre" href="/2017/04/05/maven/005.Maven Life/">005 Maven生命周期</a><a class="next" href="/2017/04/03/maven/003.HelloWorld Code/">003 POM_Demo编写</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="search-form"><input id="local-search-input" placeholder="Search" type="text" name="q" results="0"><div id="local-search-result"></div></div></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/maven/">maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mongodb/">mongodb</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springMvc/">springMvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springcloud/">springcloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/部署/" style="font-size: 15px;">部署</a> <a href="/tags/es/" style="font-size: 15px;">es</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/定时任务/" style="font-size: 15px;">定时任务</a> <a href="/tags/工具类/" style="font-size: 15px;">工具类</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker-compose install tools/">docker-compose 安装工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker cmd/">docker 基础命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/install docker/">docker/docker-compose安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/docker in out/">docker 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/elastic search dump/">es 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/29/other/linux operator/">linux常规操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/24/other/git operator/">git操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/26/springboot/sharding jdbc/">springboot2.0.6使用sharding jdbc3.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/springboot/tip-springboot tip/">springboot一些方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/08/docker/docker install tools/">docker安装工具</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">雨中风筝.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/search.js?v=0.0.0"></script><script>var search_path = 'search.xml';
+if (search_path.length == 0) {
+   search_path = 'search.xml';
+}
+var path = '/' + search_path;
+searchFunc(path, 'local-search-input', 'local-search-result');
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

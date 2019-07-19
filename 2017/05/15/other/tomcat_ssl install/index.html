@@ -1,0 +1,163 @@
+<!DOCTYPE html><html lang="[&quot;zh-CN&quot;,&quot;en&quot;,&quot;default&quot;]"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="姚杰的博客"><title>tomcat7双向认证 | 雨中风筝</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">tomcat7双向认证</h1><a id="logo" href="/.">雨中风筝</a><p class="description">雨，淅淅沥沥的下；风筝，摇曳穿梭</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">tomcat7双向认证</h1><div class="post-meta">May 15, 2017<span> | </span><span class="category"><a href="/categories/杂记/">杂记</a></span></div><div class="post-content"><p>转载改编自：</p>
+<p><a href="http://blog.csdn.net/qlp3643_1/article/details/42555875" target="_blank" rel="noopener">http://blog.csdn.net/qlp3643_1/article/details/42555875</a><br><a href="http://blog.csdn.net/kissliux/article/details/17392003" target="_blank" rel="noopener">http://blog.csdn.net/kissliux/article/details/17392003</a></p>
+<p>####开始</p>
+<ul>
+<li><p>自己安装jdk</p>
+</li>
+<li><p>生成服务器端证书：</p>
+</li>
+</ul>
+<p>生成证书的部分命令：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-genkey</td>
+<td>表示要创建一个新的密钥</td>
+</tr>
+<tr>
+<td>-dname</td>
+<td>表示密钥的Distinguished Names</td>
+</tr>
+<tr>
+<td>CN</td>
+<td>commonName</td>
+</tr>
+<tr>
+<td>OU</td>
+<td>organizationUnit</td>
+</tr>
+<tr>
+<td>O</td>
+<td>organizationName</td>
+</tr>
+<tr>
+<td>L</td>
+<td>localityName</td>
+</tr>
+<tr>
+<td>S</td>
+<td>stateName</td>
+</tr>
+<tr>
+<td>C</td>
+<td>country</td>
+</tr>
+<tr>
+<td>Distinguished Names</td>
+<td>表明了密钥的发行者身份</td>
+</tr>
+<tr>
+<td>-keyalg</td>
+<td>使用加密的算法，这里是RSA</td>
+</tr>
+<tr>
+<td>-alias</td>
+<td>密钥的别名</td>
+</tr>
+<tr>
+<td>-keypass</td>
+<td>私有密钥的密码，这里设置为changeit</td>
+</tr>
+<tr>
+<td>-keystore</td>
+<td>密钥保存在目录下的mykeystore文件中</td>
+</tr>
+<tr>
+<td>-storepass</td>
+<td>存取密码，这个密码提供系统从mykeystore文件中将信息取出</td>
+</tr>
+<tr>
+<td>-validity</td>
+<td>该密钥的有效期为 36500表示100年 (默认为90天)</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -keyalg RSA -dname <span class="string">"cn=localhost,ou=sango,o=none,l=china,st=beijing,c=cn"</span> -alias<span class="built_in"> server </span>-keypass password -keystore server.jks -storepass password -validity 3650</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成客户端证书(客户端的CN可以是任意值。 )</li>
+</ul>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">keytool</span> -genkey -keyalg <span class="type">RSA</span> -dname <span class="string">"cn=sango,ou=sango,o=none,l=china,st=beijing,c=cn"</span> -<span class="keyword">alias</span> custom -store<span class="keyword">type</span> <span class="type">PKCS12</span> -keypass password -keystore custom.p12 -storepass password -validity 3650</span><br></pre></td></tr></table></figure>
+<ul>
+<li>由于是双向SSL认证，服务器必须要信任客户端证书，因此，必须把客户端证书添加为服务器的信任认证。由于不能直接将PKCS12格式的证书库导入，我们必须先把客户端证书导出为一个单独的CER文件，使用如下命令，先把客户端证书导出为一个单独的cer文件：</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -export -alias custom -file custom<span class="selector-class">.cer</span> -keystore custom<span class="selector-class">.p12</span> -storepass password -storetype PKCS12 -rfc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后，添加客户端证书到服务器中（将已签名数字证书导入密钥库</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -import -v -alias custom -file custom<span class="selector-class">.cer</span> -keystore server<span class="selector-class">.jks</span> -storepass password</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看证书内容 </li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -list -v -keystore server<span class="selector-class">.jks</span> -storepass password</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置tomcat service.xml文件</li>
+</ul>
+<p>Xml代码 (clientAuth=”true”表示双向认证)</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector <span class="attribute">port</span>=<span class="string">"8443"</span> <span class="attribute">protocol</span>=<span class="string">"HTTP/1.1"</span> <span class="attribute">SSLEnabled</span>=<span class="string">"true"</span> </span><br><span class="line"><span class="attribute">maxThreads</span>=<span class="string">"150"</span> <span class="attribute">scheme</span>=<span class="string">"https"</span> <span class="attribute">secure</span>=<span class="string">"true"</span> </span><br><span class="line"><span class="attribute">clientAuth</span>=<span class="string">"true"</span> <span class="attribute">sslProtocol</span>=<span class="string">"TLS"</span> </span><br><span class="line"><span class="attribute">keystoreFile</span>=<span class="string">"D:/server.jks"</span> <span class="attribute">keystorePass</span>=<span class="string">"password"</span> </span><br><span class="line"><span class="attribute">truststoreFile</span>=<span class="string">"D:/server.jks"</span> <span class="attribute">truststorePass</span>=<span class="string">"password"</span> </span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+<p><connector>配置里的一些属性参数如下表：</connector></p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clientAuth</td>
+<td>如果设为true，表示Tomcat要求所有的SSL客户出示安全证书，对SSL客户进行身份验证</td>
+</tr>
+<tr>
+<td>keystoreFile</td>
+<td>指定keystore文件的存放位置，可以指定绝对路径，也可以指定相对于&lt;CATALINA_HOME&gt; （Tomcat安装目录）环境变量的相对路径。如果此项没有设定，默认情况下，Tomcat将从当前操作系统用户的用户目录下读取名为 “.keystore”的文件。</td>
+</tr>
+<tr>
+<td>keystorePass</td>
+<td>指定keystore的密码，如果此项没有设定，在默认情况下，Tomcat将使用“changeit”作为默认密码。</td>
+</tr>
+<tr>
+<td>sslProtocol</td>
+<td>指定套接字（Socket）使用的加密/解密协议，默认值为TLS，用户不应该修改这个默认值。</td>
+</tr>
+<tr>
+<td>ciphers</td>
+<td>指定套接字可用的用于加密的密码清单，多个密码间以逗号（,）分隔。如果此项没有设定，在默认情况下，套接字可以使用任意一个可用的密码。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>导入客户端证书到浏览器</li>
+</ul>
+<p>双向认证需要强制验证客户端证书。双击“custom.p12”即可将证书导入至IE</p>
+<ul>
+<li>java代码实现</li>
+</ul>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">DefaultHttpClient httpclient = new DefaultHttpClient()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType())<span class="comment">; </span></span><br><span class="line">FileInputStream <span class="keyword">instream </span>= new FileInputStream(new File(<span class="string">"D:/server.jks"</span>))<span class="comment">;</span></span><br><span class="line">try &#123;</span><br><span class="line">trustStore.load(<span class="keyword">instream, </span><span class="string">"password"</span>.toCharArray())<span class="comment">;</span></span><br><span class="line">&#125; finally &#123;</span><br><span class="line"><span class="keyword">instream.close();</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">SSLSocketFactory </span>socketFactory = new SSLSocketFactory(trustStore,<span class="string">"password"</span>,trustStore)<span class="comment">;</span></span><br><span class="line"><span class="keyword">Scheme </span><span class="keyword">sch </span>= new <span class="keyword">Scheme("https", </span>socketFactory, <span class="number">443</span>)<span class="comment">;</span></span><br><span class="line">httpclient.getConnectionManager().getSchemeRegistry().register(<span class="keyword">sch);</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">HttpGet </span>httpget = new HttpGet(<span class="string">"https://localhost:8443/"</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">System.out.println(<span class="string">"executing request"</span> + httpget.getRequestLine())<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">HttpResponse response = httpclient.execute(httpget)<span class="comment">;</span></span><br><span class="line">HttpEntity entity = response.getEntity()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">System.out.println(<span class="string">"----------------------------------------"</span>)<span class="comment">;</span></span><br><span class="line">System.out.println(response.getStatusLine())<span class="comment">;</span></span><br><span class="line">if (entity != null) &#123;</span><br><span class="line">System.out.println(<span class="string">"Response content length: "</span> + entity.getContentLength())<span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line">if (entity != null) &#123;</span><br><span class="line">entity.consumeContent()<span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line">httpclient.getConnectionManager().<span class="keyword">shutdown();</span></span><br></pre></td></tr></table></figure>
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>1.Tomcat SSL配置 Connector attribute SSLCertificateFile must be defined when using SSL with APR解决</p>
+<ul>
+<li>Tomcat提供了两个SSL实现，一个是JSSE实现，另一个是APR实现。</li>
+<li>Tomcat将自动选择使用哪个实现，即如果安装了APR则自动选择APR，否则选择JSSE。</li>
+<li>如果不希望让Tomcat自动选择，而是我们自己指定一个实现则可通过protocol定义，如下：</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Connector</span> <span class="attr">protocol</span>=<span class="string">"..."</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>APR是什么文件？后来才发现APR文件名为tcnative-1.dll。进一步检查tomcat6.0和7.0的安装目录，结果发现6.0里没这个dll文件，而7.0里有。换句话说，6.0默认使用JSSE实现，而7.0默认使用APR实现。</p>
+<p>弄明白缘由就好办了。由于习惯使用6.0的配置方式（即JSEE实现），因此只要把上面conf\server.xml里的protocol修改一下就行了：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector <span class="attribute">port</span>=<span class="string">"8443"</span> <span class="attribute">protocol</span>=<span class="string">"org.apache.coyote.http11.Http11Protocol"</span> <span class="attribute">SSLEnabled</span>=<span class="string">"true"</span></span><br><span class="line">               <span class="attribute">maxThreads</span>=<span class="string">"150"</span> <span class="attribute">scheme</span>=<span class="string">"https"</span> <span class="attribute">secure</span>=<span class="string">"true"</span></span><br><span class="line">               <span class="attribute">clientAuth</span>=<span class="string">"false"</span> <span class="attribute">sslProtocol</span>=<span class="string">"TLS"</span></span><br><span class="line">               <span class="attribute">keystoreFile</span>=<span class="string">"<span class="variable">$&#123;user.home&#125;</span>/.keystore"</span></span><br><span class="line">               <span class="attribute">keystorePass</span>=<span class="string">"changeit"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<p> 重新启动，一切正常。</p>
+<p>2.实现http向https的自动跳转</p>
+<p>在tomcat的/conf/web.xml文件后面加上这样一段</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">login-config</span>&gt;</span>  </span><br><span class="line">    <span class="comment">&lt;!-- Authorization setting for SSL --&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">auth-method</span>&gt;</span>CLIENT-CERT<span class="tag">&lt;/<span class="name">auth-method</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">realm-name</span>&gt;</span>Client Cert Users-only Area<span class="tag">&lt;/<span class="name">realm-name</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">login-config</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">security-constraint</span>&gt;</span>  </span><br><span class="line">    <span class="comment">&lt;!-- Authorization setting for SSL --&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">web-resource-collection</span> &gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">web-resource-name</span> &gt;</span>SSL<span class="tag">&lt;/<span class="name">web-resource-name</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">web-resource-collection</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">user-data-constraint</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">transport-guarantee</span>&gt;</span>CONFIDENTIAL<span class="tag">&lt;/<span class="name">transport-guarantee</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">user-data-constraint</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">security-constraint</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重新启动即可</p>
+</div><div class="tags"><a href="/tags/tomcat/">tomcat</a></div><div class="post-nav"><a class="pre" href="/2017/05/15/other/git ignore files(java)/">git忽略文件记录(java)</a><a class="next" href="/2017/05/11/mongodb/006 mongodb-JDBC/">006 mongodb-JDBC方式访问</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="search-form"><input id="local-search-input" placeholder="Search" type="text" name="q" results="0"><div id="local-search-result"></div></div></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/maven/">maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mongodb/">mongodb</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springMvc/">springMvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springcloud/">springcloud</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂记/">杂记</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/部署/" style="font-size: 15px;">部署</a> <a href="/tags/es/" style="font-size: 15px;">es</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/linux/" style="font-size: 15px;">linux</a> <a href="/tags/定时任务/" style="font-size: 15px;">定时任务</a> <a href="/tags/工具类/" style="font-size: 15px;">工具类</a> <a href="/tags/tomcat/" style="font-size: 15px;">tomcat</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker-compose install tools/">docker-compose 安装工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/docker cmd/">docker 基础命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/docker/install docker/">docker/docker-compose安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/docker in out/">docker 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/03/11/other/elastic search dump/">es 简单操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/29/other/linux operator/">linux常规操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/24/other/git operator/">git操作</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/26/springboot/sharding jdbc/">springboot2.0.6使用sharding jdbc3.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/springboot/tip-springboot tip/">springboot一些方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/10/08/docker/docker install tools/">docker安装工具</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">雨中风筝.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/search.js?v=0.0.0"></script><script>var search_path = 'search.xml';
+if (search_path.length == 0) {
+   search_path = 'search.xml';
+}
+var path = '/' + search_path;
+searchFunc(path, 'local-search-input', 'local-search-result');
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
